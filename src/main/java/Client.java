@@ -34,10 +34,12 @@ public class Client {
             while (true) {
                 try {
                     message = br.readLine();
-                    logger.log(message);
-                    System.out.println(message);
+                    if (message != null) {
+                        logger.log(message);
+                        System.out.println(message);
+                    }
                 } catch (IOException e) {
-                    System.out.println("Ошибка чтения сообщения:" + e.getMessage());
+                    System.out.println(e.getMessage());
                     closeResurces();
                     break;
                 }
@@ -80,6 +82,7 @@ public class Client {
             if (this.socket != null) {
                 this.socket.close();
             }
+//            readMessage.interrupt();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,9 +108,8 @@ public class Client {
             ex.printStackTrace();
         }
 
-        Socket socket = new Socket(host, port);
-
         try {
+            Socket socket = new Socket(host, port);
             Client client = new Client(socket, name);
             client.logger.log("Произведено подключение к серверу: " + socket.getInetAddress() + " " + socket.getPort());
             client.readMessage();
