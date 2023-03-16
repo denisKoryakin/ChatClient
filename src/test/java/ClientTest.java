@@ -36,7 +36,6 @@ public class ClientTest {
     @MethodSource("sendMessageParametersDefinition")
     public void sendMessageTest(String message) throws IOException {
 //    arrange
-        System system = Mockito.mock(System.class);
         InputStream input = new ByteArrayInputStream((message).getBytes());
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         Mockito.when(socket.getInputStream()).thenReturn(input);

@@ -1,15 +1,11 @@
 package Logger;
 
-import javax.swing.border.TitledBorder;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 
 public class LoggerImpl implements Logger {
-
-    public LoggerImpl() {
-    }
 
     Date date = new Date();
 
