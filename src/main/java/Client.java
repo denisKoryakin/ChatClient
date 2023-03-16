@@ -7,9 +7,9 @@ import Logger.*;
 public class Client {
     private BufferedReader br;
     private BufferedWriter bw;
-    private Socket socket;
-    private String name;
-    private Logger logger;
+    private final Socket socket;
+    public final String name;
+    private final Logger logger;
 
     public Client(Socket socket, String name) throws IOException {
         this.socket = socket;
@@ -20,17 +20,26 @@ public class Client {
         logger.log("клиентское приложение запущено");
     }
 
+    public BufferedReader getBr() {
+        return this.br;
+    }
+
+    public BufferedWriter getBw() {
+        return this.bw;
+    }
+
     public void readMessage() {
         Thread readMessage = new Thread(() -> {
             String message;
-            while (socket.isConnected()) {
+            while (true) {
                 try {
                     message = br.readLine();
                     logger.log(message);
                     System.out.println(message);
                 } catch (IOException e) {
                     System.out.println("Ошибка чтения сообщения:" + e.getMessage());
-// TODO: 14.03.2023 зацикливается при отключении сервера 
+                    closeResurces();
+                    break;
                 }
             }
         });
@@ -50,9 +59,29 @@ public class Client {
                 bw.write(name + ": " + messageToSend);
                 bw.newLine();
                 bw.flush();
+                if (messageToSend.equals("exit")) {
+                    closeResurces();
+                    break; /* для удобства теста */
+                }
             }
         } catch (IOException e) {
             System.out.println("Ошибка отправки сообщения:" + e.toString());
+        }
+    }
+
+    public void closeResurces() {
+        try {
+            if (this.br != null) {
+                this.br.close();
+            }
+            if (this.bw != null) {
+                this.bw.close();
+            }
+            if (this.socket != null) {
+                this.socket.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -62,9 +91,9 @@ public class Client {
         String name = scanner.nextLine();
         String host = null;
         int port = 0;
+
 //        считываем номер порта из файла
-        try (
-                BufferedReader bufferedReader = new BufferedReader(new FileReader("settings.txt"))
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader("settings.txt"))
         ) {
             String setting = bufferedReader.readLine();
             String[] settings = setting.split(", ");
@@ -75,6 +104,7 @@ public class Client {
             System.out.println(message);
             ex.printStackTrace();
         }
+
         Socket socket = new Socket(host, port);
 
         try {
